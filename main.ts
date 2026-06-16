@@ -1,30 +1,21 @@
-function hole_neigung() {
+
+function berechne_rad_werte() {
     kurve_links = kurve_rad * -1
     kurve_rechts = kurve_rad
     gerade_links = gerade_rad
     gerade_rechts = gerade_rad * rad_rechts_korrektur
-    // links_soll = Math.min(Math.max(gerade_links + kurve_links, -255), 255)
-    // rechts_soll = Math.min(Math.max(gerade_rechts + kurve_rechts, -255), 255)
-    links_soll=Math.round((gerade_links + kurve_links * feinheit)/2)
-    rechts_soll = Math.round((gerade_rechts + kurve_rechts * feinheit)/2)
+
+    links_soll = Math.round((gerade_links + kurve_links * feinheit) / 2)
+    rechts_soll = Math.round((gerade_rechts + kurve_rechts * feinheit) / 2)
 
 }
-function init() {
-    radio.setGroup(26)
-    basic.showIcon(IconNames.Diamond)
-    hebe_winkel = 70
-    motor_rechts = robotbit.Motors.M1A
-    motor_links = robotbit.Motors.M2A
-    rad_rechts_korrektur = 1
-    robotbit.MotorStopAll()
-}
+
 radio.onReceivedValue(function (info, wert) {
     if (info == "gerade") {
         gerade_get = wert
         gerade_rad = Math.round(Math.map(gerade_get, -45, 45, -255, 255))
     } else if (info == "kurve") {
         kurve_get = wert
-        // kurve_get = 5
         kurve_rad = Math.round(Math.map(kurve_get, -45, 45, -255, 255))
         // serial.writeValue("kurve_rad", kurve_rad)
     } else if (info == "kupplung") {
@@ -37,9 +28,9 @@ radio.onReceivedValue(function (info, wert) {
 })
 input.onButtonPressed(Button.B, function () {
     if (oben) {
-        robotbit.Servo(robotbit.Servos.S1, 0)
+        // robotbit.Servo(robotbit.Servos.S1, 0)
     } else {
-        robotbit.Servo(robotbit.Servos.S1, hebe_winkel)
+        // robotbit.Servo(robotbit.Servos.S1, hebe_winkel)
     }
     oben = !(oben)
 })
@@ -65,14 +56,9 @@ let rechts_ist = 0
 let feinheit = 0.5
 rad_rechts_korrektur = 1
 init()
-robotbit.Servo(robotbit.Servos.S1, 0)
+
 basic.forever(function () {
-    hole_neigung()
-    // if (rechts_soll > 255) {
-    // rechts_soll = 255
-    // } else if (rechts_soll < -255) {
-    // rechts_soll = -255
-    // }
+    berechne_rad_werte()
     if (links_ist < links_soll) {
         links_ist = Math.min(links_ist + 12, links_soll)
     } else if (links_ist > links_soll) {
@@ -89,9 +75,17 @@ basic.forever(function () {
         robotbit.MotorRun(motor_links, links_ist)
         robotbit.MotorRun(motor_rechts, rechts_ist)
     }
-    // serial.writeLine("links: " + motor_links + " rechts_ist: " + rechts_ist)
     basic.pause(10)
 })
-control.inBackground(function () {
 
-})
+function init() {
+    radio.setGroup(26)
+    basic.showIcon(IconNames.Diamond)
+    hebe_winkel = 70
+    motor_rechts = robotbit.Motors.M1A
+    motor_links = robotbit.Motors.M2A
+    rad_rechts_korrektur = 1
+    feinheit = 0.7
+    robotbit.MotorStopAll()
+    // robotbit.Servo(robotbit.Servos.S1, 0)
+}
