@@ -1,18 +1,21 @@
-function hole_neigung () {
+function hole_neigung() {
     kurve_links = kurve_rad * -1
     kurve_rechts = kurve_rad
     gerade_links = gerade_rad
     gerade_rechts = gerade_rad * rad_rechts_korrektur
-    links_soll = Math.min(Math.max(gerade_links + kurve_links, -255), 255)
-    rechts_soll = Math.min(Math.max(gerade_rechts + kurve_rechts, -255), 255)
+    // links_soll = Math.min(Math.max(gerade_links + kurve_links, -255), 255)
+    // rechts_soll = Math.min(Math.max(gerade_rechts + kurve_rechts, -255), 255)
+    links_soll=Math.round((gerade_links + kurve_links * feinheit)/2)
+    rechts_soll = Math.round((gerade_rechts + kurve_rechts * feinheit)/2)
+
 }
-function init () {
+function init() {
     radio.setGroup(26)
     basic.showIcon(IconNames.Diamond)
     hebe_winkel = 70
     motor_rechts = robotbit.Motors.M1A
-motor_links = robotbit.Motors.M2A
-rad_rechts_korrektur = 1
+    motor_links = robotbit.Motors.M2A
+    rad_rechts_korrektur = 1
     robotbit.MotorStopAll()
 }
 radio.onReceivedValue(function (info, wert) {
@@ -22,8 +25,8 @@ radio.onReceivedValue(function (info, wert) {
     } else if (info == "kurve") {
         kurve_get = wert
         // kurve_get = 5
-        kurve_rad = Math.round(Math.map(kurve_get, -45, 45, -100, 100))
-        serial.writeValue("kurve_rad", kurve_rad)
+        kurve_rad = Math.round(Math.map(kurve_get, -45, 45, -255, 255))
+        // serial.writeValue("kurve_rad", kurve_rad)
     } else if (info == "kupplung") {
         if (wert == 0) {
             robotbit.Servo(robotbit.Servos.S1, 0)
@@ -53,12 +56,13 @@ let kurve_rechts = 0
 let kurve_rad = 0
 let kurve_links = 0
 let rad_rechts_korrektur = 0
-let links_rad = 0
-let rechts_rad = 0
+let rad_links = 0
+let rad_rechts = 0
 let motor_links = 0
 let motor_rechts = 0
 let links_ist = 0
 let rechts_ist = 0
+let feinheit = 0.5
 rad_rechts_korrektur = 1
 init()
 robotbit.Servo(robotbit.Servos.S1, 0)
@@ -83,11 +87,11 @@ basic.forever(function () {
         robotbit.MotorStopAll()
     } else {
         robotbit.MotorRun(motor_links, links_ist)
-robotbit.MotorRun(motor_rechts, rechts_ist)
+        robotbit.MotorRun(motor_rechts, rechts_ist)
     }
     // serial.writeLine("links: " + motor_links + " rechts_ist: " + rechts_ist)
     basic.pause(10)
 })
 control.inBackground(function () {
-	
+
 })
